@@ -16,11 +16,14 @@
     "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.1.8",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "tailwindcss": "^4",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8",
     "typescript": "^5"
   }
 }
