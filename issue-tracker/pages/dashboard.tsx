@@ -122,120 +122,122 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Your Issues</h1>
-        <button
-          onClick={async () => {
-            await supabase.auth.signOut();
-            window.location.href = "/login";
-          }}
-          className="bg-gray-200 dark:bg-gray-700 dark:text-white text-sm px-4 py-2 rounded hover:bg-gray-300 transition"
-        >
-          Logout
-        </button>
-      </div>
-
-      {/* Filter & Stats */}
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
-        <div>
-          <label className="mr-2 font-medium">Filter:</label>
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value as "All" | "Open" | "In Progress" | "Closed")
-            }
-            className="border rounded px-2 py-1 dark:bg-[#1a1a1a] dark:text-white"
+    <div className="min-h-screen bg-purple-100 dark:bg-[#1a002a] text-gray-900 dark:text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Your Issues</h1>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              window.location.href = "/login";
+            }}
+            className="bg-purple-600 text-white text-sm px-4 py-2 rounded hover:bg-purple-700 transition"
           >
-            <option value="All">All</option>
-            <option value="Open">Open</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Closed">Closed</option>
-          </select>
+            Logout
+          </button>
         </div>
 
-        <div className="flex gap-4 text-sm text-gray-700 dark:text-gray-300">
-          <span>Total: {issues.length}</span>
-          <span>Open: {issues.filter((i) => i.status === "Open").length}</span>
-          <span>In Progress: {issues.filter((i) => i.status === "In Progress").length}</span>
-          <span>Closed: {issues.filter((i) => i.status === "Closed").length}</span>
+        {/* Filter & Stats */}
+        <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+          <div>
+            <label className="mr-2 font-medium">Filter:</label>
+            <select
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as "All" | "Open" | "In Progress" | "Closed")
+              }
+              className="border rounded px-2 py-1 dark:bg-[#2a003d] dark:text-white"
+            >
+              <option value="All">All</option>
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+
+          <div className="flex gap-4 text-sm">
+            <span>Total: {issues.length}</span>
+            <span>Open: {issues.filter((i) => i.status === "Open").length}</span>
+            <span>In Progress: {issues.filter((i) => i.status === "In Progress").length}</span>
+            <span>Closed: {issues.filter((i) => i.status === "Closed").length}</span>
+          </div>
         </div>
-      </div>
 
-      {/* Add Form */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Issue title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded w-full mb-2 dark:bg-[#1a1a1a] dark:text-white"
-        />
-        <textarea
-          placeholder="Issue description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="border p-2 rounded w-full mb-2 dark:bg-[#1a1a1a] dark:text-white"
-          rows={4}
-        />
-        <button
-          onClick={addIssue}
-          className="bg-blue-600 text-white py-2 px-4 rounded"
-        >
-          Add Issue
-        </button>
-      </div>
+        {/* Add Form */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Issue title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="border p-2 rounded w-full mb-2 dark:bg-[#2a003d] dark:text-white"
+          />
+          <textarea
+            placeholder="Issue description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="border p-2 rounded w-full mb-2 dark:bg-[#2a003d] dark:text-white"
+            rows={4}
+          />
+          <button
+            onClick={addIssue}
+            className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition"
+          >
+            Add Issue
+          </button>
+        </div>
 
-      {/* Issues Grid */}
-      {loading && <p>Loading...</p>}
-      {!loading && issues.length === 0 && <p>No issues yet.</p>}
+        {/* Issues Grid */}
+        {loading && <p>Loading...</p>}
+        {!loading && issues.length === 0 && <p>No issues yet.</p>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {issues
-          .filter((issue) =>
-            statusFilter === "All" ? true : issue.status === statusFilter
-          )
-          .map((issue) => (
-            <div key={issue.id} className="border p-4 rounded shadow bg-white dark:bg-[#121212]">
-              <div className="flex justify-between items-center">
-                <h2 className="font-semibold text-xl">{issue.title}</h2>
-                <span
-                  className={`text-xs font-semibold px-2 py-1 rounded ${statusColors[issue.status]}`}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {issues
+            .filter((issue) =>
+              statusFilter === "All" ? true : issue.status === statusFilter
+            )
+            .map((issue) => (
+              <div key={issue.id} className="border p-4 rounded shadow bg-white dark:bg-[#2a003d]">
+                <div className="flex justify-between items-center">
+                  <h2 className="font-semibold text-xl">{issue.title}</h2>
+                  <span
+                    className={`text-xs font-semibold px-2 py-1 rounded ${statusColors[issue.status]}`}
+                  >
+                    {issue.status}
+                  </span>
+                </div>
+                <p className="mt-1">{issue.description}</p>
+
+                <label className="block mt-3">
+                  Change Status:{" "}
+                  <select
+                    value={issue.status}
+                    onChange={async (e) => {
+                      const newStatus = e.target.value as "Open" | "In Progress" | "Closed";
+                      const { error } = await supabase
+                        .from("issues")
+                        .update({ status: newStatus })
+                        .eq("id", issue.id);
+                      if (error) toast.error("Failed to update status: " + error.message);
+                      else toast.success("Status updated!");
+                    }}
+                    className="border rounded px-2 py-1 mt-1 dark:bg-[#1a1a1a] dark:text-white"
+                  >
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </label>
+
+                <button
+                  onClick={() => deleteIssue(issue.id)}
+                  className="mt-3 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
                 >
-                  {issue.status}
-                </span>
+                  Delete
+                </button>
               </div>
-              <p className="mt-1">{issue.description}</p>
-
-              <label className="block mt-3">
-                Change Status:{" "}
-                <select
-                  value={issue.status}
-                  onChange={async (e) => {
-                    const newStatus = e.target.value as "Open" | "In Progress" | "Closed";
-                    const { error } = await supabase
-                      .from("issues")
-                      .update({ status: newStatus })
-                      .eq("id", issue.id);
-                    if (error) toast.error("Failed to update status: " + error.message);
-                    else toast.success("Status updated!");
-                  }}
-                  className="border rounded px-2 py-1 mt-1 dark:bg-[#1a1a1a] dark:text-white"
-                >
-                  <option value="Open">Open</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Closed">Closed</option>
-                </select>
-              </label>
-
-              <button
-                onClick={() => deleteIssue(issue.id)}
-                className="mt-3 bg-red-600 text-white px-3 py-1 rounded"
-              >
-                Delete
-              </button>
-            </div>
-          ))}
+            ))}
+        </div>
       </div>
     </div>
   );

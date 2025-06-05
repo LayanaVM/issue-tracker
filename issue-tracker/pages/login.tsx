@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import Link from "next/link";
 
@@ -7,22 +7,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [checkingSession, setCheckingSession] = useState(true); // 👈 for delaying UI render
-
-  // 👉 Check auth status before showing anything
-  useEffect(() => {
-    async function checkUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        window.location.href = "/dashboard";
-      } else {
-        setCheckingSession(false); // ✅ now safe to show the form
-      }
-    }
-    checkUser();
-  }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -43,49 +27,48 @@ export default function LoginPage() {
     setLoading(false);
   }
 
-  // 🔒 Don't show anything while checking session
-  if (checkingSession) return null;
-
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+    <div className="min-h-screen bg-purple-900 text-white flex items-center justify-center font-alumni">
+      <div className="w-full max-w-md bg-white text-purple-900 p-8 rounded-xl shadow-lg">
+        <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
 
-      {errorMsg && <p className="text-red-600 mb-4">{errorMsg}</p>}
+        {errorMsg && <p className="text-red-600 mb-4">{errorMsg}</p>}
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
-          required
-        />
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 mb-4 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
-          required
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 mb-6 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
+            required
+          />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-purple-700 text-white py-3 rounded hover:bg-purple-800 transition"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
 
-      <p className="mt-4 text-center text-sm">
-        Don’t have an account?{" "}
-        <Link href="/signup" className="text-blue-600 hover:underline">
-          Sign Up
-        </Link>
-      </p>
+        <p className="mt-6 text-center text-sm">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="text-purple-700 hover:underline">
+            Sign Up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

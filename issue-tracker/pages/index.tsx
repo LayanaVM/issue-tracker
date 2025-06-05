@@ -8,11 +8,11 @@ export default function SplashScreen() {
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
       setFadeOut(true);
-    }, 1500); // start fade after 1.5s
+    }, 1500);
 
     const redirectTimer = setTimeout(() => {
-      router.push("/login"); // or /auth
-    }, 2000); // redirect after 2s
+      router.push("/login");
+    }, 2000);
 
     return () => {
       clearTimeout(fadeTimer);
@@ -22,7 +22,7 @@ export default function SplashScreen() {
 
   return (
     <div
-      className={`flex items-center justify-center min-h-screen bg-black text-white text-4xl font-bold transition-opacity duration-500 ${
+      className={`flex items-center justify-center min-h-screen bg-purple-800 text-white text-5xl font-alumni tracking-wide transition-opacity duration-500 ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
