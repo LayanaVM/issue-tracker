@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import Link from "next/link";
 
@@ -7,8 +7,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [checkingSession, setCheckingSession] = useState(true); // 👈 for delaying UI render
 
-  async function handleLogin(e) {
+  // 👉 Check auth status before showing anything
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        window.location.href = "/dashboard";
+      } else {
+        setCheckingSession(false); // ✅ now safe to show the form
+      }
+    }
+    checkUser();
+  }, []);
+
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
@@ -26,6 +42,9 @@ export default function LoginPage() {
 
     setLoading(false);
   }
+
+  // 🔒 Don't show anything while checking session
+  if (checkingSession) return null;
 
   return (
     <div className="max-w-md mx-auto mt-20 p-6 border rounded shadow">
