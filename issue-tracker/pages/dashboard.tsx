@@ -122,16 +122,16 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-purple-100 dark:bg-[#1a002a] text-gray-900 dark:text-white p-6">
+    <div className="min-h-screen bg-[#1a001f] text-white p-6 font-sans">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Your Issues</h1>
+          <h1 className="text-3xl font-bold text-[#ff33cc]">Your Issues</h1>
           <button
             onClick={async () => {
               await supabase.auth.signOut();
               window.location.href = "/login";
             }}
-            className="bg-purple-600 text-white text-sm px-4 py-2 rounded hover:bg-purple-700 transition"
+            className="bg-[#ff33cc] text-white text-sm px-4 py-2 rounded hover:bg-pink-600 transition"
           >
             Logout
           </button>
@@ -146,7 +146,7 @@ export default function Dashboard() {
               onChange={(e) =>
                 setStatusFilter(e.target.value as "All" | "Open" | "In Progress" | "Closed")
               }
-              className="border rounded px-2 py-1 dark:bg-[#2a003d] dark:text-white"
+              className="border rounded px-2 py-1 bg-[#2a0036] text-white"
             >
               <option value="All">All</option>
               <option value="Open">Open</option>
@@ -170,18 +170,18 @@ export default function Dashboard() {
             placeholder="Issue title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="border p-2 rounded w-full mb-2 dark:bg-[#2a003d] dark:text-white"
+            className="border p-2 rounded w-full mb-2 bg-[#2a0036] text-white"
           />
           <textarea
             placeholder="Issue description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="border p-2 rounded w-full mb-2 dark:bg-[#2a003d] dark:text-white"
+            className="border p-2 rounded w-full mb-2 bg-[#2a0036] text-white"
             rows={4}
           />
           <button
             onClick={addIssue}
-            className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition"
+            className="bg-[#ff33cc] text-white py-2 px-4 rounded hover:bg-pink-600 transition"
           >
             Add Issue
           </button>
@@ -197,7 +197,7 @@ export default function Dashboard() {
               statusFilter === "All" ? true : issue.status === statusFilter
             )
             .map((issue) => (
-              <div key={issue.id} className="border p-4 rounded shadow bg-white dark:bg-[#2a003d]">
+              <div key={issue.id} className="border p-4 rounded shadow bg-[#2a0036]">
                 <div className="flex justify-between items-center">
                   <h2 className="font-semibold text-xl">{issue.title}</h2>
                   <span
@@ -221,7 +221,7 @@ export default function Dashboard() {
                       if (error) toast.error("Failed to update status: " + error.message);
                       else toast.success("Status updated!");
                     }}
-                    className="border rounded px-2 py-1 mt-1 dark:bg-[#1a1a1a] dark:text-white"
+                    className="border rounded px-2 py-1 mt-1 bg-[#1a001f] text-white"
                   >
                     <option value="Open">Open</option>
                     <option value="In Progress">In Progress</option>
