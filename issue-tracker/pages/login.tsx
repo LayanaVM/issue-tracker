@@ -1,5 +1,7 @@
+ // (If using app directory, for pages directory no need)
+
 import { useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../lib/supabaseClient"; // adjust the path if needed
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,6 +20,7 @@ export default function LoginPage() {
     if (error) {
       setErrorMsg(error.message);
     } else {
+      // Redirect on success
       window.location.href = "/dashboard";
     }
     setLoading(false);
