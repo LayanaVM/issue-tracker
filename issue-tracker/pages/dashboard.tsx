@@ -24,7 +24,7 @@ export default function Dashboard() {
   const [description, setDescription] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | "Open" | "In Progress" | "Closed">("All");
 
-  async function fetchIssues() {
+  async function fetchInitialIssues() {
     setLoading(true);
     const {
       data: { user },
@@ -46,7 +46,7 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    fetchIssues();
+    fetchInitialIssues();
 
     const channel = supabase
       .channel("realtime-issues")
@@ -58,8 +58,21 @@ export default function Dashboard() {
           table: "issues",
         },
         (payload) => {
-          console.log("Realtime change:", payload);
-          fetchIssues();
+          const newIssue = payload.new as Issue;
+          const oldIssue = payload.old as Issue;
+
+          setIssues((prevIssues) => {
+            switch (payload.eventType) {
+              case "INSERT":
+                return [newIssue, ...prevIssues];
+              case "UPDATE":
+                return prevIssues.map((i) => (i.id === newIssue.id ? newIssue : i));
+              case "DELETE":
+                return prevIssues.filter((i) => i.id !== oldIssue.id);
+              default:
+                return prevIssues;
+            }
+          });
         }
       )
       .subscribe();
@@ -72,7 +85,6 @@ export default function Dashboard() {
   async function addIssue() {
     if (!title || !description) return;
 
-    setLoading(true);
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -95,26 +107,22 @@ export default function Dashboard() {
     } else {
       toast.error("Failed to add issue: " + error.message);
     }
-    setLoading(false);
   }
 
   async function deleteIssue(issueId: number) {
     const confirmDelete = confirm("Are you sure you want to delete this issue?");
     if (!confirmDelete) return;
 
-    setLoading(true);
     const { error } = await supabase.from("issues").delete().eq("id", issueId);
-
     if (error) {
       toast.error("Error deleting issue: " + error.message);
     } else {
       toast.success("Issue deleted");
     }
-    setLoading(false);
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6">
+    <div className="max-w-6xl mx-auto mt-10 p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Your Issues</h1>
         <button
@@ -122,15 +130,14 @@ export default function Dashboard() {
             await supabase.auth.signOut();
             window.location.href = "/login";
           }}
-          className="bg-gray-200 text-sm px-4 py-2 rounded hover:bg-gray-300 transition"
+          className="bg-gray-200 dark:bg-gray-700 dark:text-white text-sm px-4 py-2 rounded hover:bg-gray-300 transition"
         >
           Logout
         </button>
       </div>
 
-      {/* FILTER + STATS */}
+      {/* Filter & Stats */}
       <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
-        {/* Filter */}
         <div>
           <label className="mr-2 font-medium">Filter:</label>
           <select
@@ -138,7 +145,7 @@ export default function Dashboard() {
             onChange={(e) =>
               setStatusFilter(e.target.value as "All" | "Open" | "In Progress" | "Closed")
             }
-            className="border rounded px-2 py-1"
+            className="border rounded px-2 py-1 dark:bg-[#1a1a1a] dark:text-white"
           >
             <option value="All">All</option>
             <option value="Open">Open</option>
@@ -147,8 +154,7 @@ export default function Dashboard() {
           </select>
         </div>
 
-        {/* Stats */}
-        <div className="flex gap-4 text-sm text-gray-700">
+        <div className="flex gap-4 text-sm text-gray-700 dark:text-gray-300">
           <span>Total: {issues.length}</span>
           <span>Open: {issues.filter((i) => i.status === "Open").length}</span>
           <span>In Progress: {issues.filter((i) => i.status === "In Progress").length}</span>
@@ -156,42 +162,41 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ADD ISSUE */}
+      {/* Add Form */}
       <div className="mb-6">
         <input
           type="text"
           placeholder="Issue title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded w-full mb-2"
+          className="border p-2 rounded w-full mb-2 dark:bg-[#1a1a1a] dark:text-white"
         />
         <textarea
           placeholder="Issue description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="border p-2 rounded w-full mb-2"
+          className="border p-2 rounded w-full mb-2 dark:bg-[#1a1a1a] dark:text-white"
           rows={4}
         />
         <button
           onClick={addIssue}
           className="bg-blue-600 text-white py-2 px-4 rounded"
-          disabled={loading}
         >
           Add Issue
         </button>
       </div>
 
-      {/* ISSUE LIST */}
+      {/* Issues Grid */}
       {loading && <p>Loading...</p>}
       {!loading && issues.length === 0 && <p>No issues yet.</p>}
 
-      <ul>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {issues
           .filter((issue) =>
             statusFilter === "All" ? true : issue.status === statusFilter
           )
           .map((issue) => (
-            <li key={issue.id} className="border p-4 rounded mb-4">
+            <div key={issue.id} className="border p-4 rounded shadow bg-white dark:bg-[#121212]">
               <div className="flex justify-between items-center">
                 <h2 className="font-semibold text-xl">{issue.title}</h2>
                 <span
@@ -208,16 +213,14 @@ export default function Dashboard() {
                   value={issue.status}
                   onChange={async (e) => {
                     const newStatus = e.target.value as "Open" | "In Progress" | "Closed";
-                    setLoading(true);
                     const { error } = await supabase
                       .from("issues")
                       .update({ status: newStatus })
                       .eq("id", issue.id);
                     if (error) toast.error("Failed to update status: " + error.message);
                     else toast.success("Status updated!");
-                    setLoading(false);
                   }}
-                  className="border rounded px-2 py-1 mt-1"
+                  className="border rounded px-2 py-1 mt-1 dark:bg-[#1a1a1a] dark:text-white"
                 >
                   <option value="Open">Open</option>
                   <option value="In Progress">In Progress</option>
@@ -228,13 +231,12 @@ export default function Dashboard() {
               <button
                 onClick={() => deleteIssue(issue.id)}
                 className="mt-3 bg-red-600 text-white px-3 py-1 rounded"
-                disabled={loading}
               >
                 Delete
               </button>
-            </li>
+            </div>
           ))}
-      </ul>
+      </div>
     </div>
   );
 }
