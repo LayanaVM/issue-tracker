@@ -1,28 +1,31 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function SplashScreen() {
   const [fadeOut, setFadeOut] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => {
-      setFadeOut(true);
-    }, 1500);
+    const checkSessionAndRedirect = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    const redirectTimer = setTimeout(() => {
-      router.push("/login");
-    }, 2000);
-
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(redirectTimer);
+      if (session) {
+        router.push("/dashboard");
+      } else {
+        setTimeout(() => setFadeOut(true), 1500);
+        setTimeout(() => router.push("/login"), 2000);
+      }
     };
+
+    checkSessionAndRedirect();
   }, []);
 
   return (
     <div
-      className={`flex items-center justify-center min-h-screen bg-purple-800 text-white text-5xl font-alumni tracking-wide transition-opacity duration-500 ${
+      className={`flex items-center justify-center min-h-screen bg-[#1a0026] text-[#ff4fe4] text-4xl font-extrabold tracking-wide transition-opacity duration-500 font-alumni ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >

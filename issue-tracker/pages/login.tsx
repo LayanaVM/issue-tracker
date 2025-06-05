@@ -1,17 +1,21 @@
+// pages/login.tsx
+
+"use client";
+
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  async function handleLogin(e: React.FormEvent) {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
+    setError(null);
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -19,52 +23,47 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setErrorMsg(error.message);
+      setError(error.message || "Login failed");
     } else {
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     }
-
-    setLoading(false);
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-purple-900 text-white flex items-center justify-center font-alumni">
-      <div className="w-full max-w-md bg-white text-purple-900 p-8 rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#1a001f] font-sans">
+      <div className="bg-[#2d0036] p-8 rounded-xl shadow-xl w-full max-w-md text-white">
+        <h1 className="text-3xl font-extrabold text-center mb-6 text-[#ff33cc]">Login</h1>
 
-        {errorMsg && <p className="text-red-600 mb-4">{errorMsg}</p>}
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
         <form onSubmit={handleLogin}>
           <input
             type="email"
             placeholder="Email"
+            className="w-full p-3 mb-4 rounded bg-[#1a001f] text-white border border-[#ff33cc] placeholder-gray-400"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 mb-4 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
-            required
+            autoComplete="email"
           />
-
           <input
             type="password"
             placeholder="Password"
+            className="w-full p-3 mb-6 rounded bg-[#1a001f] text-white border border-[#ff33cc] placeholder-gray-400"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 mb-6 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
-            required
+            autoComplete="current-password"
           />
-
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-purple-700 text-white py-3 rounded hover:bg-purple-800 transition"
+            className="w-full bg-[#ff33cc] text-white font-semibold py-2 rounded hover:bg-pink-600 transition"
           >
-            {loading ? "Logging in..." : "Login"}
+            Log In
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm">
-          Don’t have an account?{" "}
-          <Link href="/signup" className="text-purple-700 hover:underline">
+        <p className="mt-4 text-center text-sm text-gray-300">
+          Don't have an account?{" "}
+          <Link href="/signup" className="text-[#ff33cc] hover:underline">
             Sign Up
           </Link>
         </p>
